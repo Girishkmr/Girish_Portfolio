@@ -1,0 +1,57 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+# ...but the template carries no secrets and must be committed.
+!.env.local.example
+
+# The requirements spec stays local. It is the working planning document and
+# its §14 names internal Visa artifacts (review PDFs, the _How_/_What_
+# assessments, internal README filenames) in order to rule them OUT of scope.
+# That discussion is useful to keep and unsafe to publish in a public repo,
+# which is the same "if in doubt, leave it out" rule the section itself states.
+/REQUIREMENTS.html
+
+# Reference copies of the old static site. Kept locally for layout reference
+# (REQUIREMENTS.html §8) but deliberately NOT published: the repo is public,
+# and these files contain a scrapeable email address plus facts that have since
+# been corrected (CGPA, GitHub and LinkedIn handles). Publishing them would
+# undo decisions L-6 and C-1/C-2.
+/_legacy/
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts

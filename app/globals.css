@@ -1,0 +1,183 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   INK & AMBER — the site's token system. See REQUIREMENTS.html §10.
+
+   Rules this palette exists to enforce:
+     1. Ground is a deep desaturated blue-ink, never pure black, so the 3D
+        canvas has somewhere to sit without its edges banding.
+     2. ONE accent, spent in ONE place — the hero particles and a single
+        call to action per screen. Not on tags, headings, borders and links
+        at the same time.
+     3. Three faces, three jobs: serif display, quiet sans body, mono labels.
+     4. Light theme is not optional. Both themes come from the same tokens.
+
+   CONTRAST — every pair below was computed against WCAG 2.2 AA (4.5:1 for
+   normal text). Two of the values originally drafted in the spec FAILED and
+   were corrected here; do not "restore" them:
+     accent light  #B47318 on ground →  3.72:1  FAIL  → now #8F5A12 → 5.52:1
+     ink-3  light  #79818E on ground →  3.76:1  FAIL  → now #6B7280 → 4.63:1
+   Verified passes:
+     ink light        17.03:1     ink dark          15.93:1
+     ink-2 light       7.53:1     ink-2 dark         7.63:1
+     ink-3 light       4.63:1     ink-3 dark         6.20:1
+     accent light      5.52:1     accent dark        8.49:1
+     accent-fg on accent fill — light 5.77:1 · dark 8.49:1
+   ========================================================================= */
+
+/* `inline` matters: it makes each utility resolve var() at runtime rather
+   than baking the literal value in, which is what lets the theme switch
+   without regenerating CSS. */
+@theme inline {
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-rule-2: var(--rule-2);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+
+  --font-display: var(--font-display-face);
+  --font-body: var(--font-body-face);
+  --font-mono: var(--font-mono-face);
+}
+
+/* ---------------------------------------------------------------- light ---
+   The base declaration. Dark overrides only what changes. */
+:root {
+  --ground: #fafaf8;
+  --surface: #ffffff;
+  --surface-2: #f0f0ec;
+  --ink: #14181f;
+  --ink-2: #4a5260;
+  --ink-3: #6b7280;
+  --rule: #e2e2dc;
+  --rule-2: #c9c9c1;
+  --accent: #8f5a12;
+  --accent-fg: #ffffff;
+
+  color-scheme: light;
+}
+
+/* ----------------------------------------------------------------- dark ---
+   Declared twice on purpose: once for the system default (guarded so an
+   explicit light choice still wins) and once for the explicit toggle. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0c0f14;
+    --surface: #141922;
+    --surface-2: #080b0f;
+    --ink: #e8eaed;
+    --ink-2: #9aa2af;
+    --ink-3: #8a93a3;
+    --rule: #1e242e;
+    --rule-2: #2c3441;
+    --accent: #e0a048;
+    --accent-fg: #0c0f14;
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #0c0f14;
+  --surface: #141922;
+  --surface-2: #080b0f;
+  --ink: #e8eaed;
+  --ink-2: #9aa2af;
+  --ink-3: #8a93a3;
+  --rule: #1e242e;
+  --rule-2: #2c3441;
+  --accent: #e0a048;
+  --accent-fg: #0c0f14;
+
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------ base */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-body), system-ui, sans-serif;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* A visible focus ring is a §4 requirement, not a default to be removed. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--accent-fg);
+  }
+
+  /* §4: prefers-reduced-motion disables animation site-wide, including the
+     hero canvas, which reads this same signal in JS. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ----------------------------------------------------------- primitives ---
+   A handful of composed classes, so section markup stays readable rather
+   than dissolving into twenty utilities per element. */
+@layer components {
+  .shell {
+    width: 100%;
+    max-width: 68rem;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+
+  .label {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  /* Instrument Serif ships a single weight — never ask for a bolder one, or
+     the browser synthesises it and the high-contrast strokes smear. */
+  .display {
+    font-family: var(--font-display), Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 1.02;
+    text-wrap: balance;
+  }
+
+  /* The hairline spine. A single vertical rule the sections hang off, echoing
+     the left-to-right convergence of a DAG rather than boxing content in. */
+  .spine {
+    position: relative;
+  }
+
+  .spine::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 1px;
+    background: var(--rule);
+  }
+}
