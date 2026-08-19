@@ -111,6 +111,12 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* The header is sticky, so an anchor jump must stop clear of it or the
+     section heading lands underneath the nav. */
+  section[id] {
+    scroll-margin-top: 4.5rem;
+  }
+
   /* A visible focus ring is a §4 requirement, not a default to be removed. */
   :focus-visible {
     outline: 2px solid var(--accent);
@@ -164,6 +170,24 @@
     letter-spacing: -0.015em;
     line-height: 1.02;
     text-wrap: balance;
+  }
+
+  /* Off-screen until focused. The first thing a keyboard user meets. */
+  .skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 100;
+    transform: translateY(-200%);
+    background: var(--accent);
+    color: var(--accent-fg);
+    padding: 0.5rem 1rem;
+    border-radius: 2px;
+    font-size: 0.875rem;
+  }
+
+  .skip-link:focus-visible {
+    transform: translateY(0);
   }
 
   /* The hairline spine. A single vertical rule the sections hang off, echoing

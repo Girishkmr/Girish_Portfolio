@@ -1,5 +1,5 @@
 import { identity, socials } from '@/content/resume';
-import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { HeroCanvas } from '@/components/hero/HeroCanvas';
 
 /**
  * Phase 0 deliverable: one fully styled section, built on the token system,
@@ -12,15 +12,13 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
  */
 export function Hero() {
   return (
-    <section className="flex min-h-svh flex-col">
-      {/* --- top bar -------------------------------------------------- */}
-      <div className="shell flex items-center justify-between py-6">
-        <span className="label text-ink">GK</span>
-        <ThemeToggle />
-      </div>
+    <section id="top" className="relative flex min-h-[calc(100svh-4rem)] flex-col">
+      {/* Decorative, mounts client-side, sits behind everything below and is
+          removed entirely for reduced-motion and narrow viewports. */}
+      <HeroCanvas />
 
       {/* --- hero body ------------------------------------------------ */}
-      <div className="shell flex flex-1 items-center py-16">
+      <div className="shell relative flex flex-1 items-center py-16 lg:py-24">
         <div className="spine w-full pl-6 sm:pl-10">
           {/* The eyebrow reads as one line of run metadata, which is how the
               subject's own tools label a thing. */}
@@ -57,10 +55,10 @@ export function Hero() {
               View the work
             </a>
             <a
-              href="/resume.pdf"
+              href="#contact"
               className="rounded-sm border border-rule-2 px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:border-ink-3"
             >
-              Resume
+              Get in touch
             </a>
 
             <span aria-hidden className="mx-1 h-4 w-px bg-rule" />

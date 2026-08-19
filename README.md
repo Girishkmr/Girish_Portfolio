@@ -11,8 +11,9 @@ document, and it discusses employer material in order to rule it out of scope.
 
 ## Stack
 
-Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Supabase
-(Postgres, Auth, Storage) · Resend · deployed on Vercel.
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · three.js
+via @react-three/fiber (hero only, lazy) · Zod · Supabase (Postgres, Auth,
+Storage) · Resend · deployed on Vercel.
 
 ## Running locally
 
@@ -37,9 +38,13 @@ npx tsc --noEmit   # typecheck (run a build first, so route types exist)
 | Path | What it is |
 |---|---|
 | `content/resume.ts` | **Single source of truth** for every CV fact on the site |
+| `content/nav.ts` | The section list, consumed by both the nav and the page |
 | `app/globals.css` | The "Ink & Amber" token system and both themes |
 | `components/sections/` | Page sections, rendered from `content/resume.ts` |
-| `components/ui/` | Shared primitives |
+| `components/hero/` | The DAG graph, its SVG poster, and the WebGL field |
+| `components/ui/` | Shared primitives, plus the theme and media-query stores |
+| `lib/` | Contact validation, rate limiting |
+| `supabase/migrations/` | SQL, applied by hand in the Supabase SQL editor |
 
 ## One rule worth knowing
 
@@ -49,9 +54,31 @@ error on the previous version of this site — a wrong CGPA, two stale social
 handles — existed because the same fact was hand-typed into markup twice and
 drifted apart.
 
+## Two things the contact form does on purpose
+
+It **stores the message before it sends the email**, and treats a mail failure
+as success. Email is the part of a contact form that fails silently — a
+verified-domain problem, a spam folder — and a row in `messages` means an
+enquiry is never lost invisibly. The email is the notification, not the record.
+
+It **validates on the server with Zod and on the client by hand**. Sharing the
+schema was the obvious thing to do and it shipped 54KB of unused JavaScript to
+every visitor. `lib/contact-schema.ts` is server-only and authoritative;
+`lib/contact-fields.ts` is the zero-dependency shape the browser imports.
+
+## Verified
+
+Production build, Lighthouse mobile:
+
+| Performance | Accessibility | Best practices | SEO |
+|---|---|---|---|
+| 97 | 100 | 100 | 100 |
+
 ## Build status
 
 - [x] **Phase 0** — foundation: tokens, both themes, typed content, hero
-- [ ] **Phase 1** — MVP portfolio surface (FR-01 → FR-07, FR-17)
+- [x] **Phase 1** — MVP portfolio surface (FR-01 → FR-05, FR-07, FR-17, FR-18)
+  - [ ] FR-06 resume download — blocked on choosing a canonical PDF (D-2)
+  - [ ] Contact form end to end — needs Supabase credentials and a Resend key
 - [ ] **Phase 2** — writing platform
 - [ ] **Phase 3** — gallery & personal tools

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Instrument_Serif, IBM_Plex_Sans, IBM_Plex_Mono } from 'next/font/google';
 import { identity, socials } from '@/content/resume';
+import { SiteHeader } from '@/components/ui/SiteHeader';
+import { SiteFooter } from '@/components/ui/SiteFooter';
 import './globals.css';
 
 /**
@@ -23,7 +25,10 @@ const body = IBM_Plex_Sans({
   variable: '--font-body-face',
   subsets: ['latin'],
   display: 'swap',
-  weight: ['400', '500', '600'],
+  /* 400 and 500 only. Every extra weight is another font file preloaded and
+     another few hundred milliseconds of contention on a throttled connection,
+     and nothing on the site sets a semibold. */
+  weight: ['400', '500'],
 });
 
 const mono = IBM_Plex_Mono({
@@ -82,7 +87,14 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
         />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
+        <SiteHeader />
+        {children}
+        <SiteFooter />
+      </body>
     </html>
   );
 }

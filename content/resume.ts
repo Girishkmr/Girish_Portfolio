@@ -118,8 +118,15 @@ export const bio: string[] = [
 
 /* ------------------------------------------------------------------- stats */
 
+/**
+ * The four About tiles.
+ *
+ * Note what is NOT here: the 15→4 day solution build time. It is the first row
+ * of the run strip, drawn to scale, and asserting it a second time as a tile
+ * would weaken both. Tiles carry the figures that have no before/after shape.
+ */
 export const stats: Stat[] = [
-  { value: '15 → 4', label: 'Days to build a new data solution' },
+  { value: '4', label: 'Production data & AI systems shipped at Visa' },
   { value: '500+ TB', label: 'Historical load · 10+ TB monthly' },
   { value: '20+', label: 'KPIs shipped to Conversational BI' },
   { value: '7.43', label: 'CGPA · IIT Kharagpur dual degree' },
