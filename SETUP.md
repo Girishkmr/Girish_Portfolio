@@ -420,3 +420,4 @@ https://your-site/api/cron/keepalive?secret=<the value>
 | Contact form returns 503 | `SUPABASE_SERVICE_ROLE_KEY` missing in that environment |
 | Row appears in `messages`, no email | Resend — key, or the `onboarding@resend.dev` recipient restriction |
 | Live site not indexed | `NEXT_PUBLIC_SITE_URL` unset, so `robots.ts` emitted `Disallow: /` |
+| Gallery renders but every image is broken | A trailing slash on `NEXT_PUBLIC_SUPABASE_URL` produced `host//storage/...`. Supabase serves that fine, but Vercel's image optimiser 400s because it no longer matches `remotePatterns`. The code now strips trailing slashes, so this is fixed regardless — but keep the variable clean anyway |
