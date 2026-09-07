@@ -288,6 +288,71 @@ Then on the deployed site:
 
 ---
 
+## 13. Phase 3 — gallery, todos, inbox
+
+Three things, none of them code.
+
+### 13a. Run the migration
+
+Supabase → **SQL Editor** → paste `supabase/migrations/0003_gallery_todos.sql`
+→ Run. It creates `photos` and `todos`, their RLS policies, and the storage
+policies. It does **not** touch `messages`.
+
+### 13b. Create the storage bucket
+
+**Storage** → **New bucket**:
+
+- Name: **`photos`** — must match exactly; the code and the storage policies
+  both hard-code it.
+- **Public bucket: on.**
+
+> Public here means *readable by URL*, which is what a gallery is. It grants no
+> write access — uploads are governed by the policies in 0003, and without them
+> a public bucket would be an open file host. Create the bucket **after**
+> running the migration, or the policies have no bucket to attach to.
+
+### 13c. Set `CRON_SECRET`
+
+Generate one and add it in Vercel (Production is enough):
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+`vercel.json` schedules `/api/cron/keepalive` daily at 06:00 UTC. Without the
+secret the route returns 503 and refuses to run — failing closed is deliberate
+for something that touches the database. Test it by hand:
+
+```
+https://your-site/api/cron/keepalive?secret=<the value>
+```
+
+> This exists because **Supabase Free auto-pauses after a week of inactivity**,
+> and the first visitor after a quiet week would otherwise get an error — likely
+> someone arriving from your resume.
+
+### 13d. Verify
+
+1. `/gallery` loads and says "No photographs yet" — not an error.
+2. `/admin/photos` → upload two photos. Watch the per-file status go
+   `resizing → uploading → done`. An 8 MB phone photo should land as a few
+   hundred KB.
+3. `/gallery` now shows them. Click one: the lightbox opens. Press
+   **←/→** to move, **Escape** to close — focus should return to the thumbnail
+   you opened.
+4. `/admin/todos` → add a todo. It must appear **before** the request finishes.
+   Tick it; it moves to "Done today".
+5. **Privacy check.** Query `todos` with the anon key — it must return a
+   permission error or an empty set, never a row:
+   ```
+   curl "$SUPABASE_URL/rest/v1/todos?select=id" -H "apikey: $ANON_KEY"
+   ```
+6. `/admin/inbox` → your existing contact message is listed. Mark it handled.
+7. Confirm `/gallery` and `/admin/todos` are **not** in `/sitemap.xml`
+   (the gallery is public but unlisted by design; todos are private).
+
+---
+
 ## If something does not work
 
 | Symptom | Cause |

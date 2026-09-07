@@ -94,6 +94,18 @@ export function SiteHeader() {
                 active by path rather than by scroll position. */}
             <li>
               <Link
+                href="/gallery"
+                aria-current={pathname.startsWith('/gallery') ? 'true' : undefined}
+                className={`label py-2 transition-colors hover:text-ink ${
+                  pathname.startsWith('/gallery') ? 'text-ink' : ''
+                }`}
+              >
+                Gallery
+              </Link>
+            </li>
+
+            <li>
+              <Link
                 href="/writing"
                 aria-current={pathname.startsWith('/writing') ? 'true' : undefined}
                 className={`label py-2 transition-colors hover:text-ink ${

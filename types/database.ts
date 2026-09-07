@@ -78,6 +78,59 @@ export type PostUpdate = {
   updated_at?: string;
 };
 
+export type PhotoRow = {
+  id: string;
+  storage_path: string;
+  caption: string | null;
+  album: string;
+  taken_at: string | null;
+  location: string | null;
+  width: number | null;
+  height: number | null;
+  blur_data: string | null;
+  sort_order: number;
+  created_at: string;
+};
+
+export type PhotoInsert = {
+  id?: string;
+  storage_path: string;
+  caption?: string | null;
+  album?: string;
+  taken_at?: string | null;
+  location?: string | null;
+  width?: number | null;
+  height?: number | null;
+  blur_data?: string | null;
+  sort_order?: number;
+  created_at?: string;
+};
+
+export type TodoRow = {
+  id: string;
+  owner: string;
+  title: string;
+  notes: string | null;
+  done: boolean;
+  /** 1 high · 2 normal · 3 low */
+  priority: number;
+  due_on: string | null;
+  completed_at: string | null;
+  created_at: string;
+};
+
+export type TodoInsert = {
+  id?: string;
+  owner?: string;
+  title: string;
+  notes?: string | null;
+  done?: boolean;
+  priority?: number;
+  due_on?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+};
+
 export type MessageRow = {
   id: string;
   created_at: string;
@@ -103,6 +156,18 @@ export type Database = {
          * `never`, and the failure only surfaces at unrelated call sites.
          * Empty here because neither table references another.
          */
+        Relationships: [];
+      };
+      photos: {
+        Row: PhotoRow;
+        Insert: PhotoInsert;
+        Update: Partial<PhotoInsert>;
+        Relationships: [];
+      };
+      todos: {
+        Row: TodoRow;
+        Insert: TodoInsert;
+        Update: Partial<TodoInsert>;
         Relationships: [];
       };
       messages: {

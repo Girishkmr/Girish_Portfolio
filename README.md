@@ -109,7 +109,14 @@ with no client JS, so the numbers should hold, but they have not been re-run.
   - [ ] **Blocked:** create the Supabase project, run the two migrations, set
         the env vars, create the single auth user. See "Switching Phase 2 on"
   - [ ] Three real posts, per the build plan's definition of done
-- [ ] **Phase 3** — gallery & personal tools
+- [x] **Phase 3** — gallery & personal tools, **built, needs migration 0003**
+  - [x] FR-10 gallery — masonry grid by album, keyboard lightbox with focus trap
+  - [x] FR-14 photo manager — browser-side resize to WebP before upload
+  - [x] FR-15 todos — optimistic UI, due dates, priority, "Done today"
+  - [x] FR-16 inbox — reads via service role behind the session guard
+  - [x] Keep-alive cron, so the free project stops auto-pausing
+  - [ ] **Blocked:** run `0003_gallery_todos.sql`, create the `photos` storage
+        bucket (public), and set `CRON_SECRET`. See `SETUP.md` step 13
 
 ## Switching Phase 2 on
 
