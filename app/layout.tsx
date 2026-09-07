@@ -61,7 +61,16 @@ export const metadata: Metadata = {
  * Runs before first paint so a stored theme choice does not flash the wrong
  * palette. Kept deliberately tiny and dependency-free.
  */
-const themeBoot = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t)}}catch(e){}})()`;
+const themeBoot = `(function(){try{
+var d=document.documentElement;
+var t=localStorage.getItem('theme');
+if(t==='dark'||t==='light'){d.setAttribute('data-theme',t)}
+var o=localStorage.getItem('theme-overrides');
+if(!o)return;
+var c=JSON.parse(o);
+if(c&&c.tokens){for(var k in c.tokens){d.style.setProperty(k,c.tokens[k])}
+if(c.lab)d.dataset.lab='on';if(c.labFont)d.dataset.labFont='on';if(c.labScale)d.dataset.labScale='on';}
+}catch(e){}})()`;
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   const personSchema = {

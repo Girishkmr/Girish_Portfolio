@@ -1,3 +1,4 @@
+
 @import "tailwindcss";
 
 /* ============================================================================
@@ -95,6 +96,71 @@
   --accent-fg: #0c0f14;
 
   color-scheme: dark;
+}
+
+/* ------------------------------------------------- theme lab overrides ---
+   Set by /admin/theme, in this browser only, so a design can be judged
+   against real content before it is committed to.
+
+   These rules come AFTER the palette declarations above, so they win on
+   source order without needing !important. The lab writes both the light and
+   the dark set at once under distinct names, and the three blocks below pick
+   whichever the active theme wants — writing only the current mode's values
+   would break the light/dark toggle the moment an override was applied.
+
+   Nothing here ships to visitors: with no overrides in localStorage, every
+   selector below fails to match and the palette above is what renders. */
+:root[data-lab='on'] {
+  --ground: var(--lab-light-ground);
+  --surface: var(--lab-light-surface);
+  --surface-2: var(--lab-light-surface-2);
+  --ink: var(--lab-light-ink);
+  --ink-2: var(--lab-light-ink-2);
+  --ink-3: var(--lab-light-ink-3);
+  --rule: var(--lab-light-rule);
+  --rule-2: var(--lab-light-rule-2);
+  --accent: var(--lab-light-accent);
+  --accent-fg: var(--lab-light-accent-fg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-lab='on']:not([data-theme='light']) {
+    --ground: var(--lab-dark-ground);
+    --surface: var(--lab-dark-surface);
+    --surface-2: var(--lab-dark-surface-2);
+    --ink: var(--lab-dark-ink);
+    --ink-2: var(--lab-dark-ink-2);
+    --ink-3: var(--lab-dark-ink-3);
+    --rule: var(--lab-dark-rule);
+    --rule-2: var(--lab-dark-rule-2);
+    --accent: var(--lab-dark-accent);
+    --accent-fg: var(--lab-dark-accent-fg);
+  }
+}
+
+:root[data-lab='on'][data-theme='dark'] {
+  --ground: var(--lab-dark-ground);
+  --surface: var(--lab-dark-surface);
+  --surface-2: var(--lab-dark-surface-2);
+  --ink: var(--lab-dark-ink);
+  --ink-2: var(--lab-dark-ink-2);
+  --ink-3: var(--lab-dark-ink-3);
+  --rule: var(--lab-dark-rule);
+  --rule-2: var(--lab-dark-rule-2);
+  --accent: var(--lab-dark-accent);
+  --accent-fg: var(--lab-dark-accent-fg);
+}
+
+:root[data-lab-font='on'] {
+  --font-display: var(--lab-display);
+  --font-body: var(--lab-body);
+  --font-mono: var(--lab-mono);
+}
+
+/* rem-relative sizing throughout means one multiplier rescales the whole
+   page — which is also why nothing here is sized in px. */
+:root[data-lab-scale='on'] {
+  font-size: calc(100% * var(--lab-scale, 1));
 }
 
 /* ------------------------------------------------------------------ base */

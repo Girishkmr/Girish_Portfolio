@@ -46,6 +46,9 @@ export default async function ProtectedAdminLayout({
             <Link href="/admin/inbox" className="label hover:text-ink">
               Inbox
             </Link>
+            <Link href="/admin/theme" className="label hover:text-ink">
+              Theme
+            </Link>
             <Link href="/writing" className="label hover:text-ink">
               View site
             </Link>
