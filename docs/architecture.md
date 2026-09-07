@@ -205,6 +205,59 @@ unset secret is a misconfiguration, not a deployment without cron.
 
 ---
 
+## Theming
+
+Every colour and face on the site is a CSS custom property declared in
+`globals.css`. No component hard-codes a value — they read `var(--ink)`,
+`var(--accent)`, `var(--font-display)`. That is what makes both the dark-mode
+toggle and the theme lab possible without touching a single component.
+
+### The theme lab (`/admin/theme`)
+
+Auth-guarded. Offers five palettes, four type pairings and three scales, and
+applies the choice to the **whole site** — because a palette cannot be judged
+from swatches, only from real content at real sizes.
+
+**How an override wins.** The lab writes custom properties as inline styles on
+`<html>`. An element's own style attribute outranks a stylesheet rule, so no
+`!important` is needed and no CSS is regenerated.
+
+**Why both themes are written at once.** The lab sets `--lab-light-*` *and*
+`--lab-dark-*` together, and three blocks in `globals.css` select whichever the
+active theme wants. Writing only the current mode's values would break the
+light/dark toggle the moment an override was applied.
+
+**No flash.** The boot script in `app/layout.tsx` replays a stored choice
+before first paint — the same mechanism the dark-mode preference already used.
+Changing the stored shape means changing that script.
+
+### Three limits, all deliberate
+
+**It does not save to the database.** `/` is static and must never gain a data
+dependency — that is exactly why a paused Supabase project cannot take the CV
+surface down. A colour scheme is not worth surrendering it. The lab exports CSS
+to paste into `globals.css`, so shipping a theme is a commit and a deploy.
+
+**It does not affect visitors.** Overrides live in one browser's localStorage.
+A public theme switcher on a portfolio says the author could not decide.
+
+**It does not offer a freehand colour picker.** Every palette passes
+`scripts/check-contrast.mjs`, which computes WCAG AA ratios and exits non-zero
+on failure. Two of this project's original tokens failed AA and had to be
+replaced, so colour choice is not left to taste. Run it with:
+
+```bash
+npm run check:contrast
+```
+
+Fonts are limited to the three faces already loaded plus system stacks.
+Previewing an arbitrary webfont would mean loading it for every visitor or
+fetching from a CDN at runtime, and §10 rules out the font-CDN request — so
+changing the actual face is a one-line edit in `app/layout.tsx`, not a lab
+option.
+
+---
+
 ## Content flow — the one rule
 
 ```

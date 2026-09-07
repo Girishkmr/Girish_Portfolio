@@ -81,6 +81,9 @@ npx tsc --noEmit   # typecheck (run a build first, so route types exist)
 | `lib/` | Contact validation, rate limiting, Markdown, post/photo queries |
 | `lib/supabase/` | Four clients: `public` (cookie-free), `server` (session), `admin` (service role), `client` (browser) |
 | `lib/image-resize.ts` | Browser-side downscale to WebP, before upload |
+| `content/themes.ts` | Palettes and type pairings offered by the theme lab |
+| `lib/contrast.ts` | WCAG contrast maths, used to keep palettes honest |
+| `scripts/check-contrast.mjs` | `npm run check:contrast` — fails on any palette below AA |
 | `types/database.ts` | Row types — **regenerate, don't hand-edit** |
 | `proxy.ts` | Session refresh + `/admin` guard (Next 16 renamed `middleware.ts`) |
 | `vercel.json` | The daily keep-alive cron schedule |
@@ -154,6 +157,7 @@ images and is the one route likely to have moved. Re-run before quoting these.
   - [x] FR-16 inbox — reads via service role behind the session guard
   - [x] Keep-alive cron, guarded by `CRON_SECRET`, daily at 06:00 UTC
 - [x] Mobile navigation drawer behind the `GK` mark
+- [x] Theme lab at `/admin/theme` — try palettes and type against the real site
 - [ ] **Phase 4** — see "What's next"
 
 Setup is finished. `SETUP.md` remains the reference for how each dashboard
