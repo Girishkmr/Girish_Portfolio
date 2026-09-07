@@ -77,8 +77,11 @@ Production build, Lighthouse mobile:
 ## Build status
 
 - [x] **Phase 0** — foundation: tokens, both themes, typed content, hero
-- [x] **Phase 1** — MVP portfolio surface (FR-01 → FR-05, FR-07, FR-17, FR-18)
-  - [ ] FR-06 resume download — blocked on choosing a canonical PDF (D-2)
+- [x] **Phase 1** — MVP portfolio surface (FR-01 → FR-07, FR-17, FR-18)
+  - [x] FR-06 resume download — `Girish_resume_070926.pdf` is canonical (D-2 closed)
   - [ ] Contact form end to end — needs Supabase credentials and a Resend key
+  - [ ] Reconcile the new resume against `content/resume.ts` — **see D-13**, the
+        070926 PDF disagrees with the site on tenure, monthly volume, project
+        count and academic projects, and prints a phone number
 - [ ] **Phase 2** — writing platform
 - [ ] **Phase 3** — gallery & personal tools

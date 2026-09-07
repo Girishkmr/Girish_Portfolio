@@ -1,4 +1,4 @@
-import { identity, socials } from '@/content/resume';
+import { identity, resumeFile, socials } from '@/content/resume';
 import { HeroCanvas } from '@/components/hero/HeroCanvas';
 
 /**
@@ -46,7 +46,12 @@ export function Hero() {
 
           {/* One accent, spent once: the amber fill appears on exactly one
               control per screen. The second action is a rule outline, and the
-              social links are quiet text. */}
+              social links are quiet text.
+
+              FR-01 specifies two calls to action, and FR-06 makes the second
+              one the resume — the single thing a recruiter is most likely to
+              want within the first ten seconds. Contact keeps its own nav item
+              and its own section, so nothing is lost by not repeating it here. */}
           <div className="mt-10 flex flex-wrap items-center gap-x-3 gap-y-3">
             <a
               href="#experience"
@@ -54,11 +59,16 @@ export function Hero() {
             >
               View the work
             </a>
+            {/* `download` renames the saved file: the public URL has to stay
+                generic and stable, but "resume.pdf" in a recruiter's downloads
+                folder is indistinguishable from thirty others. */}
             <a
-              href="#contact"
+              href={resumeFile.href}
+              download={resumeFile.filename}
               className="rounded-sm border border-rule-2 px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:border-ink-3"
             >
-              Get in touch
+              Download résumé
+              <span className="sr-only"> (PDF, revised {resumeFile.revised})</span>
             </a>
 
             <span aria-hidden className="mx-1 h-4 w-px bg-rule" />

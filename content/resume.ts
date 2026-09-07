@@ -108,6 +108,27 @@ export const socials: Social[] = [
   },
 ];
 
+/* ------------------------------------------------------------------ resume */
+
+/**
+ * FR-06. The single canonical PDF (decision D-2), served from `public/`.
+ *
+ * Source: Resume_2026/Girish_resume_070926.pdf, copied in — not symlinked,
+ * because Vercel builds from the repo and would not resolve a link out of it.
+ * When a newer resume becomes canonical, replace `public/resume.pdf` and bump
+ * `revised` here; the URL stays stable so any link already sent keeps working.
+ *
+ * The role-targeted variants in Resume_2026/ stay off the site by design — one
+ * public URL, one document, no chance of a recruiter reading a stale variant.
+ */
+export const resumeFile = {
+  href: '/resume.pdf',
+  /** Suggested filename when saved. The public URL is generic; this is not. */
+  filename: 'Girish-Kumar-Resume.pdf',
+  /** Human-readable revision date, for the label beside the link. */
+  revised: 'September 2026',
+} as const;
+
 /* --------------------------------------------------------------------- bio */
 
 export const bio: string[] = [
@@ -428,6 +449,7 @@ export const selectedProjects: SelectedProject[] = [
 export const resume = {
   identity,
   socials,
+  resumeFile,
   bio,
   stats,
   headlineRuns,
