@@ -81,17 +81,71 @@ Goes in `SUPABASE_SERVICE_ROLE_KEY`.
 - Tick **Auto Confirm User** if offered. Without it the account sits
   unconfirmed and the magic link will not sign you in.
 
-Then turn off public sign-ups:
+Then turn off public sign-ups.
 
-**Authentication** → **Sign In / Providers** → **Email** → turn **off**
-*Allow new users to sign up* (older UI: Authentication → Settings → *Enable
-sign ups*).
+**Authentication** → **Sign In / Providers** → **Email**. This panel has **two
+separate toggles**, and they do very different things:
+
+| Toggle | Set it to | What it controls |
+|---|---|---|
+| **Enable Email provider** | **ON** | Whether email auth works *at all* — magic links, password sign-in, password resets |
+| **Allow new users to sign up** | **OFF** | Whether a *new* account can be created |
+
+> **Do not confuse these.** Turning off *Enable Email provider* does not merely
+> close registration — it disables **login**, so no magic link is ever sent and
+> nothing arrives in your inbox. The symptom looks exactly like an email
+> delivery problem, which sends you hunting through spam folders and SMTP
+> settings for a switch in the dashboard.
+>
+> Confirm which one you hit by asking the API directly:
+>
+> ```bash
+> curl "$SUPABASE_URL/auth/v1/settings" -H "apikey: $ANON_KEY"
+> ```
+>
+> You want `"email": true` under `external`, and `"disable_signup": true` at
+> the top level. If a sign-in attempt returns
+> `422 email_provider_disabled`, the master toggle is off.
 
 > Why both. `components/admin/LoginForm.tsx` passes `shouldCreateUser: false`,
 > so the form itself will not create accounts. The dashboard toggle is the
 > actual guarantee — it closes the API too. The RLS policy in `0002_posts.sql`
 > grants full write access to *any* authenticated user, because the design
 > assumes exactly one account exists. That assumption has to be enforced here.
+
+---
+
+## 5a. Point auth email at Resend (recommended)
+
+Supabase's built-in email sender is a **shared testing service with a low
+hourly cap** — a handful of messages per hour across the whole project, and no
+deliverability guarantee. It is documented as not for production. The failure
+mode is nasty: sign-in works while you are setting things up, then silently
+stops the week you actually need it, and looks identical to a bug.
+
+You already have a Resend account for the contact form, and Resend speaks SMTP,
+so the fix is configuration rather than another service.
+
+**Authentication** → **Emails** → **SMTP Settings** → enable custom SMTP:
+
+| Field | Value |
+|---|---|
+| Host | `smtp.resend.com` |
+| Port | `465` |
+| Username | `resend` (the literal word) |
+| Password | your `RESEND_API_KEY` — the same `re_…` value |
+| Sender email | `onboarding@resend.dev`, until a domain is verified |
+| Sender name | `Girish Kumar` |
+
+> The same restriction applies as for the contact form: until you verify a
+> domain with Resend, `onboarding@resend.dev` **only delivers to the Resend
+> account owner's own address**. That is fine here — you are the only person
+> who ever receives a sign-in link. Once D-1 lands and a domain is verified,
+> change the sender to an address at that domain.
+
+Supabase also caps auth emails independently under **Authentication → Rate
+Limits** ("Rate limit for sending emails"). Raise it if you hit it while
+testing; the default is deliberately small.
 
 ---
 
@@ -359,7 +413,8 @@ https://your-site/api/cron/keepalive?secret=<the value>
 |---|---|
 | `/writing` says "not connected" on the live site | Env vars added but not redeployed |
 | Magic link opens an error page | Callback URL not allow-listed (step 6) |
-| Magic link email never arrives | User was never created, or not auto-confirmed (step 5) |
+| Magic link email never arrives | **Check the Email provider master toggle first** (step 5) — a sign-in attempt returning `422 email_provider_disabled` means email auth is off entirely and nothing was ever sent. Otherwise: user never created, not auto-confirmed, or the built-in SMTP hourly cap (step 5a) |
+| Emails arrive at first, then stop | Supabase's built-in SMTP rate limit. Point custom SMTP at Resend — step 5a |
 | Signed in, but saving a post fails | Migration `0002_posts.sql` did not run, or RLS has no `authenticated` policy |
 | A draft is publicly readable | RLS is off on `posts`. Re-run the verify query from step 3 — **fix before publishing anything real** |
 | Contact form returns 503 | `SUPABASE_SERVICE_ROLE_KEY` missing in that environment |
