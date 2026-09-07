@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
 import type { PostRow, PostType } from '@/types/database';
 
@@ -32,7 +32,7 @@ export async function getPublishedPosts(filters: FeedFilters = {}): Promise<Post
   if (!isSupabaseConfigured) return [];
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
 
     let query = supabase
       .from('posts')
@@ -61,7 +61,7 @@ export async function getPostBySlug(slug: string): Promise<PostRow | null> {
   if (!isSupabaseConfigured) return null;
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
 
     const { data, error } = await supabase
       .from('posts')
