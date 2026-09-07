@@ -1,8 +1,10 @@
 # Personal site & writing platform
 
-Portfolio and writing platform for Girish Kumar — Data & AI Engineer at Visa
-Global Data Solutions. A static CV surface plus three authenticated tools: a
-merged writing feed, a photo journal, and a private task list.
+Portfolio and writing platform for Girish Kumar — Data & AI Engineer, formerly
+at Visa Global Data Solutions. A static CV surface plus three authenticated
+tools: a merged writing feed, a photo journal, and a private task list.
+
+**Live:** <https://girish-portfolio-ten.vercel.app>
 
 The full requirements specification lives at `REQUIREMENTS.html` in the project
 folder — open it in a browser. It defines scope, stack, data model, and the
@@ -23,15 +25,18 @@ cp .env.local.example .env.local   # fill in as phases require
 npm run dev
 ```
 
-Nothing in Phase 0 or Phase 1 needs Supabase credentials — the CV content is a
-typed TypeScript file, not database rows, so the home page never depends on the
-database being awake.
+The home page needs no credentials at all — CV content is a typed TypeScript
+file, not database rows, so it never depends on the database being awake.
 
-Phase 2 does need them, but degrades rather than breaks without them: the build
-stays green, `/writing` renders a "not connected" notice, `/admin` redirects to
-a login page that says why, and every read path returns an empty result instead
-of throwing. That is deliberate — a free-tier project auto-pauses after a week
-of inactivity, and the CV surface must never go down with it.
+Everything else degrades rather than breaks without credentials: the build
+stays green, `/writing` and `/gallery` render a "not connected" notice, `/admin`
+redirects to a login page that says why, and every read path returns an empty
+result instead of throwing. That is deliberate and worth preserving — a
+free-tier project auto-pauses after a week of inactivity, and the CV surface
+must never go down with it.
+
+Sign-in needs `http://localhost:3000/**` in the Supabase Auth redirect
+allow-list, which is separate from the production entry.
 
 ```bash
 npm run build      # production build
@@ -50,12 +55,30 @@ npx tsc --noEmit   # typecheck (run a build first, so route types exist)
 | `components/hero/` | The DAG graph, its SVG poster, and the WebGL field |
 | `components/ui/` | Shared primitives, plus the theme and media-query stores |
 | `components/writing/` | Feed cards, filters, and the Markdown renderer |
-| `components/admin/` | Login form and the post editor |
-| `lib/` | Contact validation, rate limiting, Markdown, post queries |
-| `lib/supabase/` | Server, browser and config clients |
+| `components/gallery/` | Masonry grid and the keyboard lightbox |
+| `components/todos/` | The optimistic todo list |
+| `components/admin/` | Login form, post editor, photo manager, inbox rows |
+| `app/writing/`, `app/gallery/` | Public routes |
+| `app/admin/` | Auth-guarded routes and their Server Actions |
+| `lib/` | Contact validation, rate limiting, Markdown, post/photo queries |
+| `lib/supabase/` | Four clients: `public` (cookie-free), `server` (session), `admin` (service role), `client` (browser) |
+| `lib/image-resize.ts` | Browser-side downscale to WebP, before upload |
 | `types/database.ts` | Row types — **regenerate, don't hand-edit** |
 | `proxy.ts` | Session refresh + `/admin` guard (Next 16 renamed `middleware.ts`) |
+| `vercel.json` | The daily keep-alive cron schedule |
 | `supabase/migrations/` | SQL, applied by hand in the Supabase SQL editor |
+| `SETUP.md` | Click-by-click dashboard setup and the failure-mode table |
+
+### Which Supabase client to use
+
+Getting this wrong is how drafts leak or a route stops being cacheable.
+
+| Client | Key | Use for |
+|---|---|---|
+| `public.ts` | anon | Public reads. Touches no cookies, so the route stays static/ISR |
+| `server.ts` | anon + session cookie | Anything needing the owner's identity — admin pages, Server Actions |
+| `admin.ts` | **service role** | Only `messages`, which has no policy for any role. Bypasses RLS, so the caller must authorise first |
+| `client.ts` | anon | Browser only: the login form and Storage uploads |
 
 ## One rule worth knowing
 
@@ -85,8 +108,9 @@ Production build, Lighthouse mobile:
 |---|---|---|---|
 | 97 | 100 | 100 | 100 |
 
-Measured before FR-19 was added. That section is server-rendered text and links
-with no client JS, so the numbers should hold, but they have not been re-run.
+**Stale.** Measured on the Phase 1 surface, before the writing platform, the
+gallery and the mobile drawer existed. The gallery in particular ships real
+images and is the one route likely to have moved. Re-run before quoting these.
 
 ## Build status
 
@@ -98,50 +122,37 @@ with no client JS, so the numbers should hold, but they have not been re-run.
   - [x] D-13 resume/site reconciliation — Visa tenure is past tense throughout,
         the micro-specialisation is removed as an error, CGPA is off the site,
         and the Paddy Disease thesis leads Selected projects
-  - [ ] Contact form end to end — needs Supabase credentials and a Resend key
-  - [ ] **D-3** — `public/resume.pdf` prints a phone number and a stale email
-        address. Serving it publishes both on an indexed page
-- [x] **Phase 2** — writing platform, **built but not yet switched on**
+  - [x] Contact form end to end — verified in production: row stored, email
+        sent, honeypot discarded, rate limit engaged
+- [x] **Phase 2** — writing platform, **live**
   - [x] Schema + RLS (`0002_posts.sql`), typed rows, Supabase clients
   - [x] Magic-link auth, `proxy.ts` guard, `/admin` dashboard and editor
   - [x] FR-08 feed, FR-09 essay pages, FR-13 editor
   - [x] FR-11 sitemap, robots, RSS
-  - [ ] **Blocked:** create the Supabase project, run the two migrations, set
-        the env vars, create the single auth user. See "Switching Phase 2 on"
-  - [ ] Three real posts, per the build plan's definition of done
-- [x] **Phase 3** — gallery & personal tools, **built, needs migration 0003**
+- [x] **Phase 3** — gallery & personal tools, **live**
   - [x] FR-10 gallery — masonry grid by album, keyboard lightbox with focus trap
   - [x] FR-14 photo manager — browser-side resize to WebP before upload
   - [x] FR-15 todos — optimistic UI, due dates, priority, "Done today"
   - [x] FR-16 inbox — reads via service role behind the session guard
-  - [x] Keep-alive cron, so the free project stops auto-pausing
-  - [ ] **Blocked:** run `0003_gallery_todos.sql`, create the `photos` storage
-        bucket (public), and set `CRON_SECRET`. See `SETUP.md` step 13
+  - [x] Keep-alive cron, guarded by `CRON_SECRET`, daily at 06:00 UTC
+- [x] Mobile navigation drawer behind the `GK` mark
+- [ ] **Phase 4** — see "What's next"
 
-## Switching Phase 2 on
+Setup is finished. `SETUP.md` remains the reference for how each dashboard
+setting was configured and the symptom → cause table for when one breaks.
 
-**`SETUP.md` is the click-by-click version** — where each key lives in the
-Supabase dashboard, how to wire Vercel, and how to verify it worked. The
-summary below is the same thing in eight lines.
+## What's next
 
-Everything below is account creation and configuration — no code changes.
+Open, in rough priority order. Nothing here blocks anything else.
 
-1. Create a Supabase project (free tier).
-2. Run `supabase/migrations/0001_messages.sql`, then `0002_posts.sql`, in the
-   SQL editor. Optionally `seed.sql` to smoke-test the feed.
-3. Verify RLS before going near production:
-   `select tablename, rowsecurity from pg_tables where schemaname='public';`
-   — every row must say `true`.
-4. Copy `.env.local.example` to `.env.local` and fill in the Supabase URL, the
-   anon key, and the service-role key. Add the same three to Vercel.
-5. In Supabase Auth, **create exactly one user** with your email, and disable
-   public sign-ups. The login form passes `shouldCreateUser: false`, but the
-   dashboard setting is the actual guarantee.
-6. Add your site URL and `<site>/auth/callback` to the Auth redirect allow-list.
-7. Regenerate row types so they come from the real schema rather than the
-   hand-written stand-in:
-   `npx supabase gen types typescript --linked > types/database.ts`
-8. Sign in at `/admin/login` and publish something.
-
-Steps 1–6 also unblock the Phase 1 contact form, which needs the same project
-plus `RESEND_API_KEY` and `CONTACT_TO_EMAIL`.
+| | Item | Why |
+|---|---|---|
+| **1** | **D-3 — the résumé PDF** | `public/resume.pdf` prints a phone number and the stale `girishkumarbtp2112@` address. Serving it publishes both on an indexed page, against the site's own no-public-contact rule |
+| **2** | **Three real posts** | Phase 2's own definition of done. The feed currently holds seed rows, which should be deleted: `delete from public.posts where slug like 'seed-%' or body_md like 'Seed:%';` |
+| **3** | **D-6 — finish the gallery** | 5 of 16 photos uploaded, all in one `life` album. The spec wants ~20 across a few albums, and consent from anyone identifiable |
+| **4** | **D-1 — a domain** | `girish-portfolio-ten.vercel.app` on a résumé undercuts the work. Also needed before a Resend domain can be verified, which is what frees the contact form and auth email from the `onboarding@resend.dev` recipient restriction |
+| **5** | **Rotate credentials** | The service-role and Resend keys were pasted into a chat during setup |
+| **6** | **FR-11 per-post OG images** | Metadata ships; generated image cards do not. This is what makes a shared link look deliberate |
+| **7** | **Backups** | Supabase Free has none. A weekly `pg_dump` into a private repo is ten minutes and the difference between "my writing" and "my writing, until something goes wrong" |
+| **8** | **Re-run Lighthouse** | The 97/100/100/100 below predates Phases 2 and 3 |
+| **9** | **"Ask my portfolio"** | The Phase 4 headline: a RAG chatbot over the posts and CV using pgvector. Demonstrates the exact skillset the master document leads with, on live inspectable data |
