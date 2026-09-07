@@ -11,6 +11,24 @@ folder — open it in a browser. It defines scope, stack, data model, and the
 build order. It is deliberately not committed: it is a working planning
 document, and it discusses employer material in order to rule it out of scope.
 
+## Documentation
+
+[`docs/`](./docs/) explains how this works and why, written to be understood
+rather than merely recorded.
+
+| | |
+|---|---|
+| [`docs/concepts.md`](./docs/concepts.md) | The underlying ideas from scratch — APIs, async/await, server vs client, JWTs, RLS, rate limiting, caching. **Start here** |
+| [`docs/architecture.md`](./docs/architecture.md) | What runs where, how a request flows, why each route renders as it does |
+| [`docs/data-model.md`](./docs/data-model.md) | Every table and column, and why the security rules read the way they do |
+| [`docs/tech-stack.md`](./docs/tech-stack.md) | Why each tool, what it beat, what it costs — including the honest gaps |
+| [`docs/incidents.md`](./docs/incidents.md) | Real bugs, how each was diagnosed, what it taught |
+| [`docs/interview.md`](./docs/interview.md) | Questions about this project, answered from the code |
+| [`docs/operations.md`](./docs/operations.md) | Reading the Supabase and Vercel dashboards; what to check when something breaks |
+
+**These are kept current.** A change that ships code without updating the
+affected doc is unfinished — see `docs/README.md`.
+
 ## Stack
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · three.js
