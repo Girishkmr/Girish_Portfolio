@@ -1,4 +1,4 @@
-import { identity, resumeFile, socials } from '@/content/resume';
+import { employerLabel, identity, resumeFile, socials } from '@/content/resume';
 import { HeroCanvas } from '@/components/hero/HeroCanvas';
 
 /**
@@ -27,7 +27,7 @@ export function Hero() {
             <span aria-hidden className="text-rule-2">
               &middot;
             </span>
-            <span>{identity.employer}</span>
+            <span>{employerLabel}</span>
             <span aria-hidden className="text-rule-2">
               &middot;
             </span>

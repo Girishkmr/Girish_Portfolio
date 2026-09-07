@@ -74,14 +74,21 @@ Production build, Lighthouse mobile:
 |---|---|---|---|
 | 97 | 100 | 100 | 100 |
 
+Measured before FR-19 was added. That section is server-rendered text and links
+with no client JS, so the numbers should hold, but they have not been re-run.
+
 ## Build status
 
 - [x] **Phase 0** — foundation: tokens, both themes, typed content, hero
-- [x] **Phase 1** — MVP portfolio surface (FR-01 → FR-07, FR-17, FR-18)
+- [x] **Phase 1** — MVP portfolio surface (FR-01 → FR-07, FR-17, FR-18, FR-19)
   - [x] FR-06 resume download — `Girish_resume_070926.pdf` is canonical (D-2 closed)
+  - [x] FR-19 certifications — five credentials, each linked to its issuer's
+        verification page rather than to a stored scan
+  - [x] D-13 resume/site reconciliation — Visa tenure is past tense throughout,
+        the micro-specialisation is removed as an error, CGPA is off the site,
+        and the Paddy Disease thesis leads Selected projects
   - [ ] Contact form end to end — needs Supabase credentials and a Resend key
-  - [ ] Reconcile the new resume against `content/resume.ts` — **see D-13**, the
-        070926 PDF disagrees with the site on tenure, monthly volume, project
-        count and academic projects, and prints a phone number
+  - [ ] **D-3** — `public/resume.pdf` prints a phone number and a stale email
+        address. Serving it publishes both on an indexed page
 - [ ] **Phase 2** — writing platform
 - [ ] **Phase 3** — gallery & personal tools

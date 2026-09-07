@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Instrument_Serif, IBM_Plex_Sans, IBM_Plex_Mono } from 'next/font/google';
-import { identity, socials } from '@/content/resume';
+import { education, identity, socials } from '@/content/resume';
 import { SiteHeader } from '@/components/ui/SiteHeader';
 import { SiteFooter } from '@/components/ui/SiteFooter';
 import './globals.css';
@@ -69,7 +69,11 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     '@type': 'Person',
     name: identity.name,
     jobTitle: identity.role,
-    worksFor: { '@type': 'Organization', name: identity.employer },
+    // No `worksFor`: the Visa role ended Aug 2026, and schema.org has no
+    // "formerly employed by" property — so asserting it would be a false
+    // structured-data claim to every crawler that reads this. `alumniOf` is
+    // the credential that is still true.
+    alumniOf: { '@type': 'CollegeOrUniversity', name: education.institution },
     url: siteUrl,
     sameAs: socials.map((s) => s.href),
   };

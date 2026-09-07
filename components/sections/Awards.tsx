@@ -32,10 +32,10 @@ export function Awards() {
         <p className="label mb-3">Education</p>
         <h3 className="display text-xl lg:text-2xl">{education.institution}</h3>
         <p className="mt-2 leading-relaxed text-ink-2">
-          {education.degree}, {education.field}. {education.specialisation}.
+          {education.degree}, {education.field}.
         </p>
         <p className="mt-2 font-mono text-xs text-ink-3 tabular-nums">
-          {education.period} <span className="text-rule-2">·</span> CGPA {education.cgpa}
+          {education.period}
         </p>
       </div>
     </Section>

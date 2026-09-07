@@ -69,13 +69,20 @@ export type SelectedProject = {
   tags: string[];
 };
 
+/**
+ * No `specialisation` field: the "Micro Specialisation in AI and Applications"
+ * that earlier versions carried was an error and does not exist.
+ *
+ * No `cgpa` field either, and that one is a choice rather than a correction —
+ * the figure is real and lives in the master career document for resumes, but
+ * it is not rendered on the site. Leaving the field out entirely means a future
+ * edit cannot quietly reintroduce it by populating an unused property.
+ */
 export type Education = {
   institution: string;
   degree: string;
   field: string;
-  specialisation: string;
   period: string;
-  cgpa: string;
 };
 
 /* ----------------------------------------------------------------- identity */
@@ -88,8 +95,20 @@ export const identity = {
   tagline:
     'I build the RAG and LLM tooling layer, and the large-scale distributed infrastructure it has to run on.',
   location: 'Bengaluru, India',
-  employer: 'Visa Inc.',
+  /**
+   * The Visa role ended Aug 2026, so the site can no longer claim it in the
+   * present tense. "Ex-Visa" keeps the credential — which is the strongest
+   * signal on the page — without asserting current employment. If a new
+   * employer lands, this becomes that name and `employerIsPast` goes false.
+   */
+  employer: 'Visa',
+  employerIsPast: true,
 } as const;
+
+/** What the hero eyebrow and footer actually print for the employer slot. */
+export const employerLabel = identity.employerIsPast
+  ? `Ex-${identity.employer}`
+  : identity.employer;
 
 /**
  * Contact is deliberately form-only — no mailto and no phone number on an
@@ -132,9 +151,9 @@ export const resumeFile = {
 /* --------------------------------------------------------------------- bio */
 
 export const bio: string[] = [
-  'I am a Data and AI engineer at Visa Global Data Solutions, where I have shipped both sides of applied AI in production — the RAG and LLM tooling layer, and the large-scale distributed ETL infrastructure it has to run on.',
+  'I am a Data and AI engineer. Across two years at Visa Global Data Solutions I shipped both sides of applied AI in production — the RAG and LLM tooling layer, and the large-scale distributed ETL infrastructure it has to run on.',
   'On one side, that means a GenAI platform that turns a module list and a configuration into a validated, deployed Airflow DAG, with a retrieval-augmented chatbot over the pipelines it generates. On the other, it means a petabyte-scale Iceberg lakehouse feeding a natural-language BI agent, and the performance work that keeps it inside its window.',
-  'I graduated from IIT Kharagpur with a dual B.Tech and M.Tech in Computer Science and a micro-specialisation in AI and Applications. I care about the part of the job most AI demos skip: cost, latency, correctness, and what happens on the run after the one you watched.',
+  'I graduated from IIT Kharagpur with a dual B.Tech and M.Tech in Computer Science. I care about the part of the job most AI demos skip: cost, latency, correctness, and what happens on the run after the one you watched.',
 ];
 
 /* ------------------------------------------------------------------- stats */
@@ -150,7 +169,10 @@ export const stats: Stat[] = [
   { value: '4', label: 'Production data & AI systems shipped at Visa' },
   { value: '500+ TB', label: 'Historical load · 10+ TB monthly' },
   { value: '20+', label: 'KPIs shipped to Conversational BI' },
-  { value: '7.43', label: 'CGPA · IIT Kharagpur dual degree' },
+  // CGPA deliberately not shown. The figure is real and stays in the master
+  // career document for resumes, but a mid-range number next to a petabyte
+  // lakehouse invites the wrong comparison. The credential does the work.
+  { value: 'IIT KGP', label: 'B.Tech + M.Tech dual degree, Computer Science' },
 ];
 
 /**
@@ -214,8 +236,8 @@ export const experience: Role[] = [
     team: 'Global Data Solutions',
     location: 'Bengaluru, India',
     start: '2024-06',
-    end: null,
-    period: 'Jun 2024 — Present',
+    end: '2026-08',
+    period: 'Jun 2024 — Aug 2026',
     projects: [
       {
         name: 'Solution Modularisation & GenAI Deployment Platform',
@@ -236,7 +258,7 @@ export const experience: Role[] = [
       {
         name: 'Conversational BI — Data Engineering',
         summary:
-          'Own the data engineering layer beneath a natural-language BI agent used by leadership to query business data and extract KPI insights. PySpark on Kubernetes, orchestrated by Airflow, over an Apache Iceberg lakehouse — one parameterised codebase serving both multi-year historical backfills and steady-state monthly loads, with idempotent re-runs and multi-hop source-to-target reconciliation at every transformation stage.',
+          'Owned the data engineering layer beneath a natural-language BI agent used by leadership to query business data and extract KPI insights. PySpark on Kubernetes, orchestrated by Airflow, over an Apache Iceberg lakehouse — one parameterised codebase serving both multi-year historical backfills and steady-state monthly loads, with idempotent re-runs and multi-hop source-to-target reconciliation at every transformation stage.',
         metrics: [
           '500+ TB historical load, 10+ TB monthly across use cases',
           'Executor starvation fixed with dynamic allocation: ~7 hrs → ~23 min (~97% faster)',
@@ -406,14 +428,22 @@ export const education: Education = {
   institution: 'Indian Institute of Technology Kharagpur',
   degree: 'B.Tech + M.Tech (Dual Degree)',
   field: 'Computer Science & Engineering',
-  specialisation: 'Micro Specialisation in AI and Applications',
   period: '2019 – 2024',
-  cgpa: '7.43 / 10',
 };
 
 /* -------------------------------------------------- selected projects (FR-17) */
 
 export const selectedProjects: SelectedProject[] = [
+  {
+    // First deliberately: it is the only project here that goes all the way
+    // from a raw dataset problem to a deployed product, which is the shape the
+    // Visa work has and the other academic entries do not.
+    name: 'Paddy Disease Classification',
+    context: 'M.Tech thesis · IIT Kharagpur · 2024',
+    summary:
+      'Merged four public datasets with mismatched resolutions and inconsistent labels into a single 20,352-image, 15-class corpus, then benchmarked ImageNet-pretrained VGG16, MobileNetV2 and ResNet50V2 under an identical fine-tuning regime. MobileNetV2 won on generalisation rather than raw accuracy — 88.3% validation with under half a point of train/validation gap, and the smallest model of the three. Shipped it as a farmer-facing web app: converted to TensorFlow.js behind an Express API with a Next.js upload UI, so a leaf photo becomes a diagnosis with no GPU at inference.',
+    tags: ['TensorFlow', 'Transfer learning', 'TensorFlow.js', 'Next.js', 'Express'],
+  },
   {
     name: 'Vision Transformer Image Classifier',
     context: 'IIT Kharagpur · Apr 2022',
@@ -444,6 +474,67 @@ export const selectedProjects: SelectedProject[] = [
   },
 ];
 
+/* --------------------------------------------------- certifications (FR-19) */
+
+/**
+ * Transcribed from the certificates themselves in `certifcations/`, so the
+ * dates and credential IDs are exact rather than remembered.
+ *
+ * Ordered newest first, which is also strongest first: the Claude Code course
+ * is the one that supports the AI/LLM positioning, and the two 2020–21 Coursera
+ * Python courses are the weakest items on the page — introductory, and older
+ * than the degree. They are included because they are real, but if this section
+ * ever needs to be shorter, they are what goes.
+ */
+export type Certification = {
+  name: string;
+  issuer: string;
+  /** Human-readable, rendered as-is. */
+  date: string;
+  /** ISO, for the <time> element and for sorting. */
+  dateISO: string;
+  /** Public verification page. Every entry here must be verifiable. */
+  href: string;
+};
+
+export const certifications: Certification[] = [
+  {
+    name: 'Claude Code — The Practical Guide',
+    issuer: 'Udemy · Academind',
+    date: 'August 2026',
+    dateISO: '2026-08-06',
+    href: 'https://ude.my/UC-f1692c42-3abf-4496-bfe2-99839d5e4008',
+  },
+  {
+    name: 'System Design for Beginners: Build Scalable Backend Systems',
+    issuer: 'Udemy · Hayk Simonyan',
+    date: 'March 2026',
+    dateISO: '2026-03-21',
+    href: 'https://ude.my/UC-b3835f9e-7159-474d-836d-acd83cf62926',
+  },
+  {
+    name: 'Understanding APIs and RESTful APIs Crash Course',
+    issuer: 'Udemy · Kalob Taulien',
+    date: 'March 2026',
+    dateISO: '2026-03-21',
+    href: 'https://ude.my/UC-87d9250a-a863-4c97-8309-764df8bbe0dd',
+  },
+  {
+    name: 'Python Data Structures',
+    issuer: 'University of Michigan · Coursera',
+    date: 'May 2021',
+    dateISO: '2021-05-27',
+    href: 'https://coursera.org/verify/KZCK7G3W246L',
+  },
+  {
+    name: 'Programming for Everybody (Getting Started with Python)',
+    issuer: 'University of Michigan · Coursera',
+    date: 'June 2020',
+    dateISO: '2020-06-29',
+    href: 'https://coursera.org/verify/3LY34WTKRH3R',
+  },
+];
+
 /* ------------------------------------------------------------------ export */
 
 export const resume = {
@@ -459,6 +550,7 @@ export const resume = {
   awards,
   education,
   selectedProjects,
+  certifications,
 } as const;
 
 export default resume;
