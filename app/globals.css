@@ -204,4 +204,159 @@
     width: 1px;
     background: var(--rule);
   }
+
+  /* ---------------------------------------------------------------- prose --
+     Post bodies (FR-08, FR-09). Written by hand rather than pulled in with
+     @tailwindcss/typography: that plugin brings its own greyscale and its own
+     opinions about scale, and reconciling them with the Ink & Amber tokens is
+     more work than the forty lines below. Every colour here is a token, so
+     both themes come for free.
+     ----------------------------------------------------------------------- */
+  .prose-ink {
+    max-width: 68ch;
+    line-height: 1.75;
+    color: var(--ink-2);
+  }
+
+  .prose-ink > * + * {
+    margin-block-start: 1.35em;
+  }
+
+  .prose-ink h2,
+  .prose-ink h3,
+  .prose-ink h4 {
+    font-family: var(--font-display), Georgia, serif;
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    text-wrap: balance;
+    margin-block-start: 2em;
+  }
+
+  .prose-ink h2 {
+    font-size: 1.75rem;
+  }
+  .prose-ink h3 {
+    font-size: 1.35rem;
+  }
+  .prose-ink h4 {
+    font-size: 1.15rem;
+  }
+
+  .prose-ink strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .prose-ink a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* A heading that links to itself must not look like a link in running text,
+     or every heading reads as an accent-coloured call to action. */
+  .prose-ink .heading-anchor {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .prose-ink .heading-anchor:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--rule-2);
+    text-underline-offset: 4px;
+  }
+
+  .prose-ink ul,
+  .prose-ink ol {
+    padding-inline-start: 1.3em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45em;
+  }
+
+  .prose-ink ul {
+    list-style: disc;
+  }
+  .prose-ink ol {
+    list-style: decimal;
+  }
+
+  .prose-ink li::marker {
+    color: var(--ink-3);
+  }
+
+  .prose-ink blockquote {
+    border-inline-start: 2px solid var(--rule-2);
+    padding-inline-start: 1.1em;
+    color: var(--ink-3);
+    font-style: italic;
+  }
+
+  .prose-ink hr {
+    border: 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .prose-ink img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 2px;
+    border: 1px solid var(--rule);
+  }
+
+  /* Tables come from remark-gfm and are the one element most likely to
+     overflow a phone, so they scroll inside themselves. */
+  .prose-ink table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92em;
+    display: block;
+    overflow-x: auto;
+  }
+
+  .prose-ink th,
+  .prose-ink td {
+    border-bottom: 1px solid var(--rule);
+    padding: 0.5em 0.75em;
+    text-align: start;
+    vertical-align: top;
+  }
+
+  .prose-ink th {
+    color: var(--ink);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* ------------------------------------------------------------- shiki ----
+     Shiki emits light colours inline and dark ones as --shiki-dark custom
+     properties, so a single server render serves both themes and the theme
+     toggle needs no re-highlight. These rules perform the swap.
+
+     !important is load-bearing here, not laziness: the values being overridden
+     are inline style attributes on every span, and nothing else outranks those.
+     ----------------------------------------------------------------------- */
+  .shiki-block .shiki {
+    margin: 0;
+    padding: 1rem 1.1rem;
+    font-size: 0.82rem;
+    line-height: 1.65;
+    overflow-x: auto;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) .shiki,
+    :root:not([data-theme='light']) .shiki span {
+      color: var(--shiki-dark) !important;
+      background-color: var(--shiki-dark-bg) !important;
+    }
+  }
+
+  :root[data-theme='dark'] .shiki,
+  :root[data-theme='dark'] .shiki span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+  }
 }

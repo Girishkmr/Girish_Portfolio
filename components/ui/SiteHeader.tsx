@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { navItems } from '@/content/nav';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
@@ -15,6 +17,14 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 export function SiteHeader() {
   const [active, setActive] = useState<string | null>(null);
   const [lifted, setLifted] = useState(false);
+  const pathname = usePathname();
+
+  /* The section links are anchors into the home page. On /writing those ids do
+     not exist, so they have to be absolute (`/#about`) rather than bare
+     fragments — a bare `#about` on another route scrolls nowhere and silently
+     rewrites the URL. On the home page itself the absolute form still behaves
+     as a same-page jump. */
+  const isHome = pathname === '/';
 
   /* Scroll spy. Observing the sections directly is cheaper and steadier than
      measuring offsets on every scroll frame. The band keeps the "active"
@@ -60,25 +70,39 @@ export function SiteHeader() {
       <div className="shell flex items-center justify-between gap-6 py-4">
         {/* The accessible name has to CONTAIN the visible text, or voice
             control users saying "GK" get no match. */}
-        <a href="#top" className="label text-ink" aria-label="GK — back to top">
+        <Link href="/" className="label text-ink" aria-label="GK — home">
           GK
-        </a>
+        </Link>
 
         <nav aria-label="Sections" className="hidden md:block">
           <ul className="flex items-center gap-6">
             {navItems.map((item) => (
               <li key={item.id}>
                 <a
-                  href={`#${item.id}`}
-                  aria-current={active === item.id ? 'true' : undefined}
+                  href={`/#${item.id}`}
+                  aria-current={isHome && active === item.id ? 'true' : undefined}
                   className={`label py-2 transition-colors hover:text-ink ${
-                    active === item.id ? 'text-ink' : ''
+                    isHome && active === item.id ? 'text-ink' : ''
                   }`}
                 >
                   {item.label}
                 </a>
               </li>
             ))}
+
+            {/* A route, not a section — so it is a Link, and it marks itself
+                active by path rather than by scroll position. */}
+            <li>
+              <Link
+                href="/writing"
+                aria-current={pathname.startsWith('/writing') ? 'true' : undefined}
+                className={`label py-2 transition-colors hover:text-ink ${
+                  pathname.startsWith('/writing') ? 'text-ink' : ''
+                }`}
+              >
+                Writing
+              </Link>
+            </li>
           </ul>
         </nav>
 

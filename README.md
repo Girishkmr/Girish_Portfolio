@@ -27,6 +27,12 @@ Nothing in Phase 0 or Phase 1 needs Supabase credentials — the CV content is a
 typed TypeScript file, not database rows, so the home page never depends on the
 database being awake.
 
+Phase 2 does need them, but degrades rather than breaks without them: the build
+stays green, `/writing` renders a "not connected" notice, `/admin` redirects to
+a login page that says why, and every read path returns an empty result instead
+of throwing. That is deliberate — a free-tier project auto-pauses after a week
+of inactivity, and the CV surface must never go down with it.
+
 ```bash
 npm run build      # production build
 npm run lint       # eslint
@@ -43,7 +49,12 @@ npx tsc --noEmit   # typecheck (run a build first, so route types exist)
 | `components/sections/` | Page sections, rendered from `content/resume.ts` |
 | `components/hero/` | The DAG graph, its SVG poster, and the WebGL field |
 | `components/ui/` | Shared primitives, plus the theme and media-query stores |
-| `lib/` | Contact validation, rate limiting |
+| `components/writing/` | Feed cards, filters, and the Markdown renderer |
+| `components/admin/` | Login form and the post editor |
+| `lib/` | Contact validation, rate limiting, Markdown, post queries |
+| `lib/supabase/` | Server, browser and config clients |
+| `types/database.ts` | Row types — **regenerate, don't hand-edit** |
+| `proxy.ts` | Session refresh + `/admin` guard (Next 16 renamed `middleware.ts`) |
 | `supabase/migrations/` | SQL, applied by hand in the Supabase SQL editor |
 
 ## One rule worth knowing
@@ -90,5 +101,36 @@ with no client JS, so the numbers should hold, but they have not been re-run.
   - [ ] Contact form end to end — needs Supabase credentials and a Resend key
   - [ ] **D-3** — `public/resume.pdf` prints a phone number and a stale email
         address. Serving it publishes both on an indexed page
-- [ ] **Phase 2** — writing platform
+- [x] **Phase 2** — writing platform, **built but not yet switched on**
+  - [x] Schema + RLS (`0002_posts.sql`), typed rows, Supabase clients
+  - [x] Magic-link auth, `proxy.ts` guard, `/admin` dashboard and editor
+  - [x] FR-08 feed, FR-09 essay pages, FR-13 editor
+  - [x] FR-11 sitemap, robots, RSS
+  - [ ] **Blocked:** create the Supabase project, run the two migrations, set
+        the env vars, create the single auth user. See "Switching Phase 2 on"
+  - [ ] Three real posts, per the build plan's definition of done
 - [ ] **Phase 3** — gallery & personal tools
+
+## Switching Phase 2 on
+
+Everything below is account creation and configuration — no code changes.
+
+1. Create a Supabase project (free tier).
+2. Run `supabase/migrations/0001_messages.sql`, then `0002_posts.sql`, in the
+   SQL editor. Optionally `seed.sql` to smoke-test the feed.
+3. Verify RLS before going near production:
+   `select tablename, rowsecurity from pg_tables where schemaname='public';`
+   — every row must say `true`.
+4. Copy `.env.local.example` to `.env.local` and fill in the Supabase URL, the
+   anon key, and the service-role key. Add the same three to Vercel.
+5. In Supabase Auth, **create exactly one user** with your email, and disable
+   public sign-ups. The login form passes `shouldCreateUser: false`, but the
+   dashboard setting is the actual guarantee.
+6. Add your site URL and `<site>/auth/callback` to the Auth redirect allow-list.
+7. Regenerate row types so they come from the real schema rather than the
+   hand-written stand-in:
+   `npx supabase gen types typescript --linked > types/database.ts`
+8. Sign in at `/admin/login` and publish something.
+
+Steps 1–6 also unblock the Phase 1 contact form, which needs the same project
+plus `RESEND_API_KEY` and `CONTACT_TO_EMAIL`.
