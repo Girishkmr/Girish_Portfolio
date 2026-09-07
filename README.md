@@ -113,6 +113,10 @@ with no client JS, so the numbers should hold, but they have not been re-run.
 
 ## Switching Phase 2 on
 
+**`SETUP.md` is the click-by-click version** — where each key lives in the
+Supabase dashboard, how to wire Vercel, and how to verify it worked. The
+summary below is the same thing in eight lines.
+
 Everything below is account creation and configuration — no code changes.
 
 1. Create a Supabase project (free tier).
