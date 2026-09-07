@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { bio, identity, stats } from '@/content/resume';
+import { bio, identity, portrait, stats } from '@/content/resume';
 import { Section } from '@/components/ui/Section';
 
 /**
@@ -24,10 +24,10 @@ export function About() {
 
         <figure className="order-first sm:order-none">
           <Image
-            src="/girish-kumar.jpeg"
+            src={portrait.src}
             alt={`${identity.name}, ${identity.role}`}
-            width={827}
-            height={1063}
+            width={portrait.width}
+            height={portrait.height}
             priority={false}
             sizes="(min-width: 640px) 13rem, 9rem"
             className="w-36 rounded-sm border border-rule object-cover sm:w-52"

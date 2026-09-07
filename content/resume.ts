@@ -127,6 +127,29 @@ export const socials: Social[] = [
   },
 ];
 
+/* --------------------------------------------------------------- portrait */
+
+/**
+ * The About photograph.
+ *
+ * Here rather than hard-coded in `About.tsx` for the same reason every other
+ * fact on this site lives in this file: a path typed into markup is a path that
+ * drifts. The intrinsic dimensions travel with it because `next/image` needs
+ * them to reserve the box before the file arrives — get them wrong and the
+ * section shifts as it loads, which is a Lighthouse penalty and a visibly
+ * cheap-looking page.
+ *
+ * The source file is downscaled to 1200px before it enters the repo. The
+ * camera original was 2130px and 3.8 MB; `next/image` would have served a
+ * sensible size regardless, but the 3.8 MB copy would still sit in a public
+ * git repository forever, in every clone and every build.
+ */
+export const portrait = {
+  src: '/girish-kumar-portrait.jpg',
+  width: 1200,
+  height: 1200,
+} as const;
+
 /* ------------------------------------------------------------------ resume */
 
 /**
